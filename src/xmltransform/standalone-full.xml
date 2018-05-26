@@ -142,8 +142,8 @@
                     <driver-class>oracle.jdbc.OracleDriver</driver-class>
                     <driver>ojdbc6.jar</driver>
                     <security>
-                        <user-name>X3JINST_10</user-name>
-                        <password>X3JINST_10</password>
+                        <user-name>Usuario1</user-name>
+                        <password>Contrasenya1</password>
                     </security>
                     <validation>
                         <validate-on-match>false</validate-on-match>
@@ -158,8 +158,8 @@
                     <driver-class>oracle.jdbc.OracleDriver</driver-class>
                     <driver>ojdbc6.jar</driver>
                     <security>
-                        <user-name>X3PRINST_10</user-name>
-                        <password>X3PRINST_10</password>
+                        <user-name>Usuario2</user-name>
+                        <password>Contrasenya2</password>
                     </security>
                     <validation>
                         <validate-on-match>false</validate-on-match>
@@ -174,8 +174,8 @@
                     <driver-class>oracle.jdbc.OracleDriver</driver-class>
                     <driver>ojdbc6.jar</driver>
                     <security>
-                        <user-name>Usuario</user-name>
-                        <password>Contrasenya</password>
+                        <user-name>Usuario3</user-name>
+                        <password>Contrasenya3</password>
                     </security>
                     <validation>
                         <validate-on-match>false</validate-on-match>
