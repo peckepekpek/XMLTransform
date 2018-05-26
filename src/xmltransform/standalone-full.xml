@@ -1,0 +1,2911 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<server xmlns="urn:jboss:domain:1.7">
+
+    <extensions>
+        <extension module="org.jboss.as.clustering.infinispan"/>
+        <extension module="org.jboss.as.cmp"/>
+        <extension module="org.jboss.as.connector"/>
+        <extension module="org.jboss.as.deployment-scanner"/>
+        <extension module="org.jboss.as.ee"/>
+        <extension module="org.jboss.as.ejb3"/>
+        <extension module="org.jboss.as.jacorb"/>
+        <extension module="org.jboss.as.jaxr"/>
+        <extension module="org.jboss.as.jaxrs"/>
+        <extension module="org.jboss.as.jdr"/>
+        <extension module="org.jboss.as.jmx"/>
+        <extension module="org.jboss.as.jpa"/>
+        <extension module="org.jboss.as.jsf"/>
+        <extension module="org.jboss.as.jsr77"/>
+        <extension module="org.jboss.as.logging"/>
+        <extension module="org.jboss.as.mail"/>
+        <extension module="org.jboss.as.messaging"/>
+        <extension module="org.jboss.as.naming"/>
+        <extension module="org.jboss.as.pojo"/>
+        <extension module="org.jboss.as.remoting"/>
+        <extension module="org.jboss.as.sar"/>
+        <extension module="org.jboss.as.security"/>
+        <extension module="org.jboss.as.threads"/>
+        <extension module="org.jboss.as.transactions"/>
+        <extension module="org.jboss.as.web"/>
+        <extension module="org.jboss.as.webservices"/>
+        <extension module="org.jboss.as.weld"/>
+    </extensions>
+
+
+    <management>
+        <security-realms>
+            <security-realm name="ManagementRealm">
+                <authentication>
+                    <local default-user="$local" skip-group-loading="true"/>
+                    <properties path="mgmt-users.properties" relative-to="jboss.server.config.dir"/>
+                </authentication>
+                <authorization map-groups-to-roles="false">
+                    <properties path="mgmt-groups.properties" relative-to="jboss.server.config.dir"/>
+                </authorization>
+            </security-realm>
+            <security-realm name="ApplicationRealm">
+                <authentication>
+                    <local default-user="$local" allowed-users="*" skip-group-loading="true"/>
+                    <properties path="application-users.properties" relative-to="jboss.server.config.dir"/>
+                </authentication>
+                <authorization>
+                    <properties path="application-roles.properties" relative-to="jboss.server.config.dir"/>
+                </authorization>
+            </security-realm>
+        </security-realms>
+        <audit-log>
+            <formatters>
+                <json-formatter name="json-formatter"/>
+            </formatters>
+            <handlers>
+                <file-handler name="file" formatter="json-formatter" path="audit-log.log" relative-to="jboss.server.data.dir"/>
+            </handlers>
+            <logger log-boot="true" log-read-only="false" enabled="false">
+                <handlers>
+                    <handler name="file"/>
+                </handlers>
+            </logger>
+        </audit-log>
+        <management-interfaces>
+            <native-interface security-realm="ManagementRealm">
+                <socket-binding native="management-native"/>
+            </native-interface>
+            <http-interface security-realm="ManagementRealm">
+                <socket-binding http="management-http"/>
+            </http-interface>
+        </management-interfaces>
+        <access-control provider="simple">
+            <role-mapping>
+                <role name="SuperUser">
+                    <include>
+                        <user name="$local"/>
+                    </include>
+                </role>
+            </role-mapping>
+        </access-control>
+    </management>
+
+    <profile>
+        <subsystem xmlns="urn:jboss:domain:logging:1.5">
+            <console-handler name="CONSOLE">
+                <level name="INFO"/>
+                <formatter>
+                    <named-formatter name="COLOR-PATTERN"/>
+                </formatter>
+            </console-handler>
+            <periodic-rotating-file-handler name="FILE" autoflush="true">
+                <formatter>
+                    <named-formatter name="PATTERN"/>
+                </formatter>
+                <file relative-to="jboss.server.log.dir" path="server.log"/>
+                <suffix value=".yyyy-MM-dd"/>
+                <append value="true"/>
+            </periodic-rotating-file-handler>
+            <logger category="com.arjuna">
+                <level name="WARN"/>
+            </logger>
+            <logger category="org.apache.tomcat.util.modeler">
+                <level name="WARN"/>
+            </logger>
+            <logger category="org.jboss.as.config">
+                <level name="DEBUG"/>
+            </logger>
+            <logger category="sun.rmi">
+                <level name="WARN"/>
+            </logger>
+            <logger category="jacorb">
+                <level name="WARN"/>
+            </logger>
+            <logger category="jacorb.config">
+                <level name="ERROR"/>
+            </logger>
+            <root-logger>
+                <level name="INFO"/>
+                <handlers>
+                    <handler name="CONSOLE"/>
+                    <handler name="FILE"/>
+                </handlers>
+            </root-logger>
+            <formatter name="PATTERN">
+                <pattern-formatter pattern="%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n"/>
+            </formatter>
+            <formatter name="COLOR-PATTERN">
+                <pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n"/>
+            </formatter>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:cmp:1.1"/>
+        <subsystem xmlns="urn:jboss:domain:datasources:1.2">
+            <datasources>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46131411" pool-name="46131411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_10</user-name>
+                        <password>X3JINST_10</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46131412" pool-name="46131412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_10</user-name>
+                        <password>X3PRINST_10</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46131511" pool-name="46131511-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JPEN_10</user-name>
+                        <password>X3JPEN_10</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46131000" pool-name="46131000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_10</user-name>
+                        <password>X3SCNE_10</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46250431" pool-name="46250431-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.driver.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_10</user-name>
+                        <password>X3JINST_10</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46250481" pool-name="46250481-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.driver.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_10</user-name>
+                        <password>X3JINST_10</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46250662" pool-name="46250662-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.driver.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+						<user-name>X3JMER_95</user-name>
+                        <password>t3mposfury54</password>
+					</security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46250472" pool-name="46250472-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.driver.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+						<user-name>X3JMER_95</user-name>
+                        <password>t3mposfury54</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46250422" pool-name="46250422-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.driver.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_10</user-name>
+                        <password>X3PRINST_10</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46250311" pool-name="46250311-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_10</user-name>
+                        <password>X3PRINST_10</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46250312" pool-name="46250312-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_10</user-name>
+                        <password>X3PRINST_10</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46250333" pool-name="46250333-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_10</user-name>
+                        <password>X3PRINST_10</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46250344" pool-name="46250344-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_10</user-name>
+                        <password>X3PRINST_10</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46250371" pool-name="46250371-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3APPEN_95</user-name>
+                        <password>v1d2omu3rt3</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46250372" pool-name="46250372-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3APCIV_95</user-name>
+                        <password>c2c3r3sinn13v3</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46250453" pool-name="46250453-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JCONA_95</user-name>
+                        <password>c2lixt00s</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46250511" pool-name="46250511-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JPEN_10</user-name>
+                        <password>X3JPEN_10</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46250536" pool-name="46250536-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JMENORES_95</user-name>
+                        <password>calle3na214</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46250736" pool-name="46250736-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3FMENORES_95</user-name>
+                        <password>m13rc0l3s765</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46250444" pool-name="46250444-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.driver.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JSOC_95</user-name>
+                        <password>socr2t3s</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46250411" pool-name="46250411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.driver.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_10</user-name>
+                        <password>X3JINST_10</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46250412" pool-name="46250412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.driver.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_10</user-name>
+                        <password>X3PRINST_10</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46213411" pool-name="46213411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_10</user-name>
+                        <password>X3JINST_10</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46213412" pool-name="46213412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_10</user-name>
+                        <password>X3PRINST_10</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46213000" pool-name="46213000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_10</user-name>
+                        <password>X3SCNE_10</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46244411" pool-name="46244411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46244412" pool-name="46244412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46244511" pool-name="46244511-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JPEN_11</user-name>
+                        <password>X3JPEN_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46244000" pool-name="46244000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46220411" pool-name="46220411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46220412" pool-name="46220412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46220000" pool-name="46220000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46094411" pool-name="46094411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46094412" pool-name="46094412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46094000" pool-name="46094000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46147411" pool-name="46147411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46147412" pool-name="46147412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46147000" pool-name="46147000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46017411" pool-name="46017411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46017412" pool-name="46017412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46017000" pool-name="46017000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46017511" pool-name="46017511-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JPEN_14</user-name>
+                        <password>GKlOeD51gDwOcbKXm1zc</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46145411" pool-name="46145411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46145412" pool-name="46145412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46145000" pool-name="46145000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46085411" pool-name="46085411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                      </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46085412" pool-name="46085412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46085000" pool-name="46085000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46235411" pool-name="46235411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46235412" pool-name="46235412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46235000" pool-name="46235000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46194411" pool-name="46194411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46194412" pool-name="46194412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46194000" pool-name="46194000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46171411" pool-name="46171411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46171412" pool-name="46171412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46171000" pool-name="46171000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46169411" pool-name="46169411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_24</user-name>
+                        <password>X3JINST_24</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46169412" pool-name="46169412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_24</user-name>
+                        <password>X3PRINST_24</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46169000" pool-name="46169000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46164411" pool-name="46164411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46164412" pool-name="46164412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46164000" pool-name="46164000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46190411" pool-name="46190411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46190412" pool-name="46190412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46190000" pool-name="46190000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46102411" pool-name="46102411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46102412" pool-name="46102412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46102000" pool-name="46102000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46184411" pool-name="46184411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46184412" pool-name="46184412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46184000" pool-name="46184000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03014371" pool-name="03014371-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3APPEN_95</user-name>
+                        <password>v1d2omu3rt3</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03014372" pool-name="03014372-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3APCIV_95</user-name>
+                        <password>c2c3r3sinn13v3</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03014736" pool-name="03014736-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3FMENORES_95</user-name>
+                        <password>m13rc0l3s765</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03014453" pool-name="03014453-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JCONA_95</user-name>
+                        <password>c2lixt00s</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03014431" pool-name="03014431-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03014536" pool-name="03014536-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JMENORES_95</user-name>
+                        <password>calle3na214</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03014662" pool-name="03014662-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JMER_95</user-name>
+                        <password>t3mposfury54</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03014511" pool-name="03014511-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JPEN_11</user-name>
+                        <password>X3JPEN_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03014444" pool-name="03014444-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JSOC_95</user-name>
+                        <password>socr2t3s</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03014422" pool-name="03014422-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03014000" pool-name="03014000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03065371" pool-name="03065371-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3APPEN_95</user-name>
+                        <password>v1d2omu3rt3</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03065372" pool-name="03065372-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3APCIV_95</user-name>
+                        <password>c2c3r3sinn13v3</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03065431" pool-name="03065431-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03065422" pool-name="03065422-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03065453" pool-name="03065453-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JCONA_95</user-name>
+                        <password>c2lixt00s</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03065511" pool-name="03065511-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JPEN_11</user-name>
+                        <password>X3JPEN_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03065444" pool-name="03065444-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JSOC_95</user-name>
+                        <password>socr2t3s</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03065662" pool-name="03065662-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JMER_95</user-name>
+                        <password>t3mposfury54</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03099411" pool-name="03099411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03099412" pool-name="03099412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03099511" pool-name="03099511-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JPEN_11</user-name>
+                        <password>X3JPEN_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03099000" pool-name="03099000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03031431" pool-name="03031431-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03031422" pool-name="03031422-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03031000" pool-name="03031000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03031511" pool-name="03031511-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JPEN_11</user-name>
+                        <password>X3JPEN_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03031444" pool-name="03031444-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JSOC_95</user-name>
+                        <password>socr2t3s</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03063411" pool-name="03063411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03063412" pool-name="03063412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03063000" pool-name="03063000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03066411" pool-name="03066411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03066412" pool-name="03066412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03122411" pool-name="03122411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03122412" pool-name="03122412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03122000" pool-name="03122000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+					</security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03009411" pool-name="03009411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03009412" pool-name="03009412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03009000" pool-name="03009000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03093411" pool-name="03093411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03093412" pool-name="03093412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03093000" pool-name="03093000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03140411" pool-name="03140411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03140412" pool-name="03140412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03140000" pool-name="03140000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03133411" pool-name="03133411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03133511" pool-name="03133511-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JPEN_11</user-name>
+                        <password>X3JPEN_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03133412" pool-name="03133412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03133000" pool-name="03133000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03079411" pool-name="03079411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03079412" pool-name="03079412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03079000" pool-name="03079000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12040371" pool-name="12040371-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3APPEN_95</user-name>
+                        <password>v1d2omu3rt3</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12040372" pool-name="12040372-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3APCIV_95</user-name>
+                        <password>c2c3r3sinn13v3</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12040736" pool-name="12040736-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3FMENORES_95</user-name>
+                        <password>m13rc0l3s765</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12040453" pool-name="12040453-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JCONA_95</user-name>
+                        <password>c2lixt00s</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12040431" pool-name="12040431-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_95</user-name>
+                        <password>otemporaom0r3s</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12040536" pool-name="12040536-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JMENORES_95</user-name>
+                        <password>calle3na214</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12040662" pool-name="12040662-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JMER_95</user-name>
+                        <password>t3mposfury54</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12040511" pool-name="12040511-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JPEN_95</user-name>
+                        <password>kan00kan00</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12040444" pool-name="12040444-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JSOC_95</user-name>
+                        <password>socr2t3s</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12040422" pool-name="12040422-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_95</user-name>
+                        <password>v1l2saco</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12082411" pool-name="12082411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12082412" pool-name="12082412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12082000" pool-name="12082000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12135411" pool-name="12135411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12135412" pool-name="12135412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12135000" pool-name="12135000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12138411" pool-name="12138411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12138412" pool-name="12138412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12138000" pool-name="12138000-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3SCNE_11</user-name>
+                        <password>X3SCNE_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12138511" pool-name="12138511-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JPEN_11</user-name>
+                        <password>X3JPEN_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12104412" pool-name="12104412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/12104411" pool-name="12104411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03139411" pool-name="03139411-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03099422" pool-name="03099422-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_95</user-name>
+                        <password>v1l2saco</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03139412" pool-name="03139412-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03133431" pool-name="03133431-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_11</user-name>
+                        <password>X3JINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03133422" pool-name="03133422-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/03099431" pool-name="03099431-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_95</user-name>
+                        <password>otemporaom0r3s</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46131431" pool-name="46131431-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3JINST_95</user-name>
+                        <password>otemporaom0r3s</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <datasource jta="false" jndi-name="java:jboss/env/jdbc/46131422" pool-name="46131422-pool" enabled="true" use-ccm="false">
+                    <connection-url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=dbdoracle10.srv.gva.es)(PORT=1600)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=jusdesa)))</connection-url>
+                    <driver-class>oracle.jdbc.OracleDriver</driver-class>
+                    <driver>ojdbc6.jar</driver>
+                    <security>
+                        <user-name>X3PRINST_11</user-name>
+                        <password>X3PRINST_11</password>
+                    </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
+                    <statement>
+                        <share-prepared-statements>false</share-prepared-statements>
+                    </statement>
+                </datasource>
+                <drivers>
+                    <driver name="h2" module="com.h2database.h2">
+                        <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
+                    </driver>
+                    <driver name="ojdbc6.jar" module="com.oracle.db">
+                        <xa-datasource-class>oracle.jdbc.xa.client.OracleXADataSource</xa-datasource-class>
+                    </driver>
+                </drivers>
+            </datasources>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:deployment-scanner:1.1">
+            <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:ee:1.2">
+            <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
+            <jboss-descriptor-property-replacement>true</jboss-descriptor-property-replacement>
+            <annotation-property-replacement>false</annotation-property-replacement>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:ejb3:1.5">
+            <session-bean>
+                <stateless>
+                    <bean-instance-pool-ref pool-name="slsb-strict-max-pool"/>
+                </stateless>
+                <stateful default-access-timeout="5000" cache-ref="simple"/>
+                <singleton default-access-timeout="5000"/>
+            </session-bean>
+            <mdb>
+                <resource-adapter-ref resource-adapter-name="${ejb.resource-adapter-name:hornetq-ra}"/>
+                <bean-instance-pool-ref pool-name="mdb-strict-max-pool"/>
+            </mdb>
+            <pools>
+                <bean-instance-pools>
+                    <strict-max-pool name="slsb-strict-max-pool" max-pool-size="20" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
+                    <strict-max-pool name="mdb-strict-max-pool" max-pool-size="20" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
+                </bean-instance-pools>
+            </pools>
+            <caches>
+                <cache name="simple" aliases="NoPassivationCache"/>
+                <cache name="passivating" passivation-store-ref="file" aliases="SimpleStatefulCache"/>
+            </caches>
+            <passivation-stores>
+                <file-passivation-store name="file"/>
+            </passivation-stores>
+            <async thread-pool-name="default"/>
+            <timer-service thread-pool-name="default" default-data-store="default-file-store">
+                <data-stores>
+                    <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>
+                </data-stores>
+            </timer-service>
+            <remote connector-ref="remoting-connector" thread-pool-name="default"/>
+            <thread-pools>
+                <thread-pool name="default">
+                    <max-threads count="10"/>
+                    <keepalive-time time="100" unit="milliseconds"/>
+                </thread-pool>
+            </thread-pools>
+            <iiop enable-by-default="false" use-qualified-name="false"/>
+            <default-security-domain value="other"/>
+            <default-missing-method-permissions-deny-access value="true"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:infinispan:1.5">
+            <cache-container name="web" aliases="standard-session-cache" default-cache="local-web" module="org.jboss.as.clustering.web.infinispan">
+                <local-cache name="local-web" batching="true">
+                    <file-store passivation="false" purge="false"/>
+                </local-cache>
+            </cache-container>
+            <cache-container name="hibernate" default-cache="local-query" module="org.jboss.as.jpa.hibernate:4">
+                <local-cache name="entity">
+                    <transaction mode="NON_XA"/>
+                    <eviction strategy="LRU" max-entries="10000"/>
+                    <expiration max-idle="100000"/>
+                </local-cache>
+                <local-cache name="local-query">
+                    <transaction mode="NONE"/>
+                    <eviction strategy="LRU" max-entries="10000"/>
+                    <expiration max-idle="100000"/>
+                </local-cache>
+                <local-cache name="timestamps">
+                    <transaction mode="NONE"/>
+                    <eviction strategy="NONE"/>
+                </local-cache>
+            </cache-container>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:jacorb:1.4">
+            <orb socket-binding="jacorb" ssl-socket-binding="jacorb-ssl">
+                <initializers security="identity" transactions="spec"/>
+            </orb>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:jaxr:1.1">
+            <connection-factory jndi-name="java:jboss/jaxr/ConnectionFactory"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:jca:1.1">
+            <archive-validation enabled="true" fail-on-error="true" fail-on-warn="false"/>
+            <bean-validation enabled="true"/>
+            <default-workmanager>
+                <short-running-threads>
+                    <core-threads count="50"/>
+                    <queue-length count="50"/>
+                    <max-threads count="50"/>
+                    <keepalive-time time="10" unit="seconds"/>
+                </short-running-threads>
+                <long-running-threads>
+                    <core-threads count="50"/>
+                    <queue-length count="50"/>
+                    <max-threads count="50"/>
+                    <keepalive-time time="10" unit="seconds"/>
+                </long-running-threads>
+            </default-workmanager>
+            <cached-connection-manager/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:jdr:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:jmx:1.3">
+            <expose-resolved-model/>
+            <expose-expression-model/>
+            <remoting-connector/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:jpa:1.1">
+            <jpa default-datasource="" default-extended-persistence-inheritance="DEEP"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:jsf:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:jsr77:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:mail:1.2">
+            <mail-session name="default" jndi-name="java:jboss/mail/Default">
+                <smtp-server outbound-socket-binding-ref="mail-smtp"/>
+            </mail-session>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:messaging:1.4">
+            <hornetq-server>
+                <persistence-enabled>true</persistence-enabled>
+                <journal-type>NIO</journal-type>
+                <journal-min-files>2</journal-min-files>
+
+                <connectors>
+                    <netty-connector name="netty" socket-binding="messaging"/>
+                    <netty-connector name="netty-throughput" socket-binding="messaging-throughput">
+                        <param key="batch-delay" value="50"/>
+                    </netty-connector>
+                    <in-vm-connector name="in-vm" server-id="0"/>
+                </connectors>
+
+                <acceptors>
+                    <netty-acceptor name="netty" socket-binding="messaging"/>
+                    <netty-acceptor name="netty-throughput" socket-binding="messaging-throughput">
+                        <param key="batch-delay" value="50"/>
+                        <param key="direct-deliver" value="false"/>
+                    </netty-acceptor>
+                    <in-vm-acceptor name="in-vm" server-id="0"/>
+                </acceptors>
+
+                <security-settings>
+                    <security-setting match="#">
+                        <permission type="send" roles="guest"/>
+                        <permission type="consume" roles="guest"/>
+                        <permission type="createNonDurableQueue" roles="guest"/>
+                        <permission type="deleteNonDurableQueue" roles="guest"/>
+                    </security-setting>
+                </security-settings>
+
+                <address-settings>
+                    <address-setting match="#">
+                        <dead-letter-address>jms.queue.DLQ</dead-letter-address>
+                        <expiry-address>jms.queue.ExpiryQueue</expiry-address>
+                        <redelivery-delay>0</redelivery-delay>
+                        <max-size-bytes>10485760</max-size-bytes>
+                        <page-size-bytes>2097152</page-size-bytes>
+                        <address-full-policy>PAGE</address-full-policy>
+                        <message-counter-history-day-limit>10</message-counter-history-day-limit>
+                    </address-setting>
+                </address-settings>
+
+                <jms-connection-factories>
+                    <connection-factory name="InVmConnectionFactory">
+                        <connectors>
+                            <connector-ref connector-name="in-vm"/>
+                        </connectors>
+                        <entries>
+                            <entry name="java:/ConnectionFactory"/>
+                        </entries>
+                    </connection-factory>
+                    <connection-factory name="RemoteConnectionFactory">
+                        <connectors>
+                            <connector-ref connector-name="netty"/>
+                        </connectors>
+                        <entries>
+                            <entry name="java:jboss/exported/jms/RemoteConnectionFactory"/>
+                        </entries>
+                    </connection-factory>
+                    <pooled-connection-factory name="hornetq-ra">
+                        <transaction mode="xa"/>
+                        <connectors>
+                            <connector-ref connector-name="in-vm"/>
+                        </connectors>
+                        <entries>
+                            <entry name="java:/JmsXA"/>
+                        </entries>
+                    </pooled-connection-factory>
+                </jms-connection-factories>
+
+                <jms-destinations>
+                    <jms-queue name="ExpiryQueue">
+                        <entry name="java:/jms/queue/ExpiryQueue"/>
+                    </jms-queue>
+                    <jms-queue name="DLQ">
+                        <entry name="java:/jms/queue/DLQ"/>
+                    </jms-queue>
+                </jms-destinations>
+            </hornetq-server>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:naming:1.4">
+            <remote-naming/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:pojo:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:remoting:1.2">
+            <connector name="remoting-connector" socket-binding="remoting" security-realm="ApplicationRealm"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:resource-adapters:1.1"/>
+        <subsystem xmlns="urn:jboss:domain:sar:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:security:1.2">
+            <security-domains>
+                <security-domain name="other" cache-type="default">
+                    <authentication>
+                        <login-module code="Remoting" flag="optional">
+                            <module-option name="password-stacking" value="useFirstPass"/>
+                        </login-module>
+                        <login-module code="RealmDirect" flag="required">
+                            <module-option name="password-stacking" value="useFirstPass"/>
+                        </login-module>
+                    </authentication>
+                </security-domain>
+                <security-domain name="jboss-web-policy" cache-type="default">
+                    <authorization>
+                        <policy-module code="Delegating" flag="required"/>
+                    </authorization>
+                </security-domain>
+                <security-domain name="jboss-ejb-policy" cache-type="default">
+                    <authorization>
+                        <policy-module code="Delegating" flag="required"/>
+                    </authorization>
+                </security-domain>
+            </security-domains>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:threads:1.1"/>
+        <subsystem xmlns="urn:jboss:domain:transactions:1.5">
+            <core-environment>
+                <process-id>
+                    <uuid/>
+                </process-id>
+            </core-environment>
+            <recovery-environment socket-binding="txn-recovery-environment" status-socket-binding="txn-status-manager"/>
+            <coordinator-environment default-timeout="300"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:web:2.2" default-virtual-server="default-host" native="false">
+            <connector name="http" protocol="HTTP/1.1" scheme="http" socket-binding="http"/>
+            <virtual-server name="default-host" enable-welcome-root="true">
+                <alias name="localhost"/>
+                <alias name="example.com"/>
+            </virtual-server>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:webservices:1.2">
+            <modify-wsdl-address>true</modify-wsdl-address>
+            <wsdl-host>${jboss.bind.address:127.0.0.1}</wsdl-host>
+            <endpoint-config name="Standard-Endpoint-Config"/>
+            <endpoint-config name="Recording-Endpoint-Config">
+                <pre-handler-chain name="recording-handlers" protocol-bindings="##SOAP11_HTTP ##SOAP11_HTTP_MTOM ##SOAP12_HTTP ##SOAP12_HTTP_MTOM">
+                    <handler name="RecordingHandler" class="org.jboss.ws.common.invocation.RecordingServerHandler"/>
+                </pre-handler-chain>
+            </endpoint-config>
+            <client-config name="Standard-Client-Config"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
+    </profile>
+
+    <interfaces>
+        <interface name="management">
+            <inet-address value="${jboss.bind.address.management:127.0.0.1}"/>
+        </interface>
+        <interface name="public">
+            <inet-address value="${jboss.bind.address:127.0.0.1}"/>
+        </interface>
+        <interface name="unsecure">
+            <inet-address value="${jboss.bind.address.unsecure:127.0.0.1}"/>
+        </interface>
+    </interfaces>
+
+    <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
+        <socket-binding name="management-native" interface="management" port="${jboss.management.native.port:9999}"/>
+        <socket-binding name="management-http" interface="management" port="${jboss.management.http.port:9990}"/>
+        <socket-binding name="management-https" interface="management" port="${jboss.management.https.port:9443}"/>
+        <socket-binding name="ajp" port="8009"/>
+        <socket-binding name="http" port="8080"/>
+        <socket-binding name="https" port="8443"/>
+        <socket-binding name="jacorb" interface="unsecure" port="3528"/>
+        <socket-binding name="jacorb-ssl" interface="unsecure" port="3529"/>
+        <socket-binding name="messaging" port="5445"/>
+        <socket-binding name="messaging-group" port="0" multicast-address="${jboss.messaging.group.address:231.7.7.7}" multicast-port="${jboss.messaging.group.port:9876}"/>
+        <socket-binding name="messaging-throughput" port="5455"/>
+        <socket-binding name="remoting" port="4447"/>
+        <socket-binding name="txn-recovery-environment" port="4712"/>
+        <socket-binding name="txn-status-manager" port="4713"/>
+        <outbound-socket-binding name="mail-smtp">
+            <remote-destination host="localhost" port="25"/>
+        </outbound-socket-binding>
+    </socket-binding-group>
+
+    <deployments>
+    </deployments>
+</server>
